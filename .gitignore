@@ -1,0 +1,77 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual Environment - CRITICAL!
+venv/
+env/
+ENV/
+.venv/
+virtualenv/
+Scripts/
+Lib/
+Include/
+pip-selfcheck.json
+
+# Django
+*.log
+*.pot
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+/media
+/staticfiles
+/static
+
+# Rasa - IMPORTANT!
+.rasa/
+**/.rasa/
+models/*.tar.gz
+results/
+
+# Environment variables - SECURITY!
+.env
+.env.local
+*.env
+config.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# OS Files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Build/Distribution
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Backup files
+*.bak
+*.backup
+*~

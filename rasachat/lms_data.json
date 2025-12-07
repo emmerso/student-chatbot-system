@@ -1,0 +1,187 @@
+{
+  "students": {
+    "WUA001": {
+      "name": "Mary Chimbga",
+      "program": "Bachelor of Business Administration",
+      "semester": "Second Semester 2024",
+      "gpa": "3.75",
+      "courses": ["ENT101", "MGT201", "ACC101", "ICT101", "COM101"]
+    },
+    "WUA002": {
+      "name": "Grace Mukamuri",
+      "program": "Bachelor of Information Technology",
+      "semester": "Second Semester 2024",
+      "gpa": "3.92",
+      "courses": ["ICT201", "ICT202", "MAT101", "ENT101", "COM101"]
+    },
+    "WUA003": {
+      "name": "Faith Nyoro",
+      "program": "Bachelor of Gender Studies",
+      "semester": "Second Semester 2024",
+      "gpa": "3.68",
+      "courses": ["GEN201", "SOC101", "ENT101", "COM101", "RES101"]
+    }
+  },
+  "courses": {
+    "ENT101": {
+      "name": "Introduction to Entrepreneurship",
+      "schedule": "Mon 09:00-10:30, Wed 09:00-10:30",
+      "room": "Business Building Room 101",
+      "instructor": "Dr. Sarah Moyo",
+      "credits": 3
+    },
+    "MGT201": {
+      "name": "Principles of Management",
+      "schedule": "Tue 11:00-12:30, Thu 11:00-12:30",
+      "room": "Business Building Room 205",
+      "instructor": "Prof. Linda Chidemo",
+      "credits": 3
+    },
+    "ACC101": {
+      "name": "Financial Accounting",
+      "schedule": "Mon 14:00-15:30, Wed 14:00-15:30",
+      "room": "Commerce Building Room 102",
+      "instructor": "Dr. Patricia Zulu",
+      "credits": 3
+    },
+    "ICT101": {
+      "name": "Introduction to Computing",
+      "schedule": "Tue 08:00-09:30, Fri 08:00-09:30",
+      "room": "ICT Lab 1",
+      "instructor": "Dr. Anna Marange",
+      "credits": 3
+    },
+    "COM101": {
+      "name": "Communication Skills",
+      "schedule": "Wed 10:00-11:30, Fri 10:00-11:30",
+      "room": "Humanities Building Room 301",
+      "instructor": "Prof. Grace Banda",
+      "credits": 2
+    },
+    "ICT201": {
+      "name": "Web Development",
+      "schedule": "Mon 13:00-14:30, Thu 13:00-14:30",
+      "room": "ICT Lab 2",
+      "instructor": "Dr. Tariro Muchena",
+      "credits": 3
+    },
+    "ICT202": {
+      "name": "Database Systems",
+      "schedule": "Tue 15:00-16:30, Fri 15:00-16:30",
+      "room": "ICT Lab 3",
+      "instructor": "Prof. Rumbidzai Chikwava",
+      "credits": 3
+    },
+    "MAT101": {
+      "name": "Business Mathematics",
+      "schedule": "Mon 11:00-12:30, Wed 11:00-12:30",
+      "room": "Science Building Room 201",
+      "instructor": "Dr. Memory Zhou",
+      "credits": 3
+    },
+    "GEN201": {
+      "name": "Gender and Development",
+      "schedule": "Tue 09:00-10:30, Thu 09:00-10:30",
+      "room": "Gender Studies Building Room 101",
+      "instructor": "Dr. Susan Ndlovu",
+      "credits": 3
+    },
+    "SOC101": {
+      "name": "Introduction to Sociology",
+      "schedule": "Mon 16:00-17:30, Wed 16:00-17:30",
+      "room": "Social Sciences Room 202",
+      "instructor": "Prof. Chiedza Maphosa",
+      "credits": 3
+    },
+    "RES101": {
+      "name": "Research Methods",
+      "schedule": "Fri 13:00-15:00",
+      "room": "Research Center Room 105",
+      "instructor": "Dr. Fadzai Machirori",
+      "credits": 3
+    }
+  },
+  "grades": {
+    "WUA001": {
+      "ENT101": {"grade": "A", "percentage": "92"},
+      "MGT201": {"grade": "A-", "percentage": "89"},
+      "ACC101": {"grade": "B+", "percentage": "87"},
+      "ICT101": {"grade": "A", "percentage": "94"},
+      "COM101": {"grade": "A-", "percentage": "90"}
+    },
+    "WUA002": {
+      "ICT201": {"grade": "A", "percentage": "95"},
+      "ICT202": {"grade": "A", "percentage": "96"},
+      "MAT101": {"grade": "A-", "percentage": "91"},
+      "ENT101": {"grade": "A", "percentage": "93"},
+      "COM101": {"grade": "A", "percentage": "94"}
+    },
+    "WUA003": {
+      "GEN201": {"grade": "B+", "percentage": "88"},
+      "SOC101": {"grade": "A-", "percentage": "90"},
+      "ENT101": {"grade": "B+", "percentage": "87"},
+      "COM101": {"grade": "A-", "percentage": "89"},
+      "RES101": {"grade": "A", "percentage": "92"}
+    }
+  },
+  "assignments": {
+    "WUA001": [
+      {
+        "title": "Business Plan Project",
+        "course": "ENT101 - Introduction to Entrepreneurship",
+        "due_date": "2024-10-15",
+        "status": "pending",
+        "type": "Project"
+      },
+      {
+        "title": "Management Case Study",
+        "course": "MGT201 - Principles of Management",
+        "due_date": "2024-10-10",
+        "status": "submitted",
+        "grade": "A-",
+        "feedback": "Excellent analysis with good practical applications"
+      },
+      {
+        "title": "Financial Statements",
+        "course": "ACC101 - Financial Accounting",
+        "due_date": "2024-10-05",
+        "status": "overdue",
+        "type": "Assignment"
+      }
+    ],
+    "WUA002": [
+      {
+        "title": "E-commerce Website",
+        "course": "ICT201 - Web Development",
+        "due_date": "2024-10-20",
+        "status": "pending",
+        "type": "Project"
+      },
+      {
+        "title": "Database Design",
+        "course": "ICT202 - Database Systems",
+        "due_date": "2024-10-12",
+        "status": "submitted",
+        "grade": "A",
+        "feedback": "Perfect normalization and efficient design"
+      }
+    ],
+    "WUA003": [
+      {
+        "title": "Gender Analysis Paper",
+        "course": "GEN201 - Gender and Development",
+        "due_date": "2024-10-18",
+        "status": "pending",
+        "type": "Research Paper"
+      },
+      {
+        "title": "Research Proposal",
+        "course": "RES101 - Research Methods",
+        "due_date": "2024-10-08",
+        "status": "submitted",
+        "grade": "A-",
+        "feedback": "Well-structured proposal with clear methodology"
+      }
+    ]
+  }
+}

@@ -1,0 +1,159 @@
+version: "3.1"
+
+intents:
+  - greet
+  - ask_about_wua
+  - ask_admission
+  - ask_fees_payment
+  - ask_contact_info
+  - ask_faculties
+  - ask_general_wua  # NEW: For SerpAPI questions
+  - goodbye
+  - thank_you
+  - nlu_fallback
+  - out_of_scope
+  - affirm
+
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - hey
+    - good morning
+    - good afternoon
+    - hi there
+
+- intent: goodbye
+  examples: |
+    - goodbye
+    - bye
+    - see you later
+    - have a nice day
+    - catch you later
+
+- intent: thank_you
+  examples: |
+    - thanks
+    - thank you
+    - appreciate it
+    - thanks a lot
+    - thank you so much
+
+- intent: ask_about_wua
+  examples: |
+    - tell me about WUA
+    - what is Women's University in Africa?
+    - give me information about the university
+    - tell me about the university
+    - what is WUA
+    - information about WUA
+
+- intent: ask_admission
+  examples: |
+    - what are the admission requirements?
+    - how do I apply?
+    - admission process at WUA
+    - how can I get admitted
+    - what do I need to apply
+    - admission criteria
+    - how to apply to WUA
+    - entry requirements
+
+- intent: ask_fees_payment
+  examples: |
+    - what are the fees?
+    - how much does it cost?
+    - payment plans
+    - tuition fees
+    - cost of studying
+    - how much to pay
+    - payment options
+    - school fees
+
+- intent: ask_contact_info
+  examples: |
+    - how can I contact the university?
+    - phone number of WUA
+    - email address for WUA
+    - contact details
+    - how do I reach WUA
+    - university contact
+    - give me contact information
+
+- intent: ask_faculties
+  examples: |
+    - which faculties are available?
+    - what departments are there?
+    - tell me about the academic faculties
+    - what faculties does WUA have
+    - list of faculties
+    - available departments
+
+- intent: affirm
+  examples: |
+    - yes
+    - yeah
+    - correct
+    - that's right
+    - sure
+    - absolutely
+    - indeed
+    - yep
+
+- intent: out_of_scope
+  examples: |
+    - what is the weather today
+    - tell me a joke
+    - who won the football match
+    - what's for dinner
+    - how old are you
+    - can you sing a song
+    - what's your favorite color
+    - play music
+    - order pizza
+
+# Add this new intent for general questions that should use SerpAPI
+- intent: ask_general_wua
+  examples: |
+    - what programs does WUA offer
+    - tell me about programs at WUA
+    - what courses are available
+    - does WUA have science programs
+    - what can I study at WUA
+    - tell me about the library
+    - what is the campus like
+    - does WUA offer online courses
+    - what are the graduation requirements
+    - tell me about student accommodation
+    - does WUA have hostels
+    - what clubs are available
+    - student activities at WUA
+    - campus facilities
+    - library facilities at WUA
+    - sports at WUA
+    - what extracurricular activities
+    - research opportunities
+    - internship programs
+    - student support services
+    - Who is the vice chancellor of WUA
+    - vice chancellor
+    - career guidance at WUA
+
+- intent: ask_student_records
+  examples: |
+    - what is my GPA
+    - show my grades
+    - my assignments
+    - what courses am I taking
+    - my academic record
+    - student info
+    - check my GPA
+    - what are my grades
+    -grades
+
+- intent: provide_student_name
+  examples: |
+    - my name is alice johnson
+    - i'm jane doe
+    - my name is [student name]   

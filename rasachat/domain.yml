@@ -1,0 +1,35 @@
+version: "3.1"
+
+intents:
+  - greet
+  - ask_about_wua
+  - ask_student_records
+  - provide_student_name
+  - ask_admission
+  - ask_fees_payment
+  - ask_contact_info
+  - ask_faculties
+  - ask_general_wua  # NEW: For SerpAPI questions
+  - goodbye
+  - thank_you
+  - nlu_fallback
+  - out_of_scope
+  - affirm
+  
+
+actions:
+  - action_answer_wua_question
+  - action_web_search
+  - action_provide_contact_info
+  - action_multilingual
+  - action_get_student_info
+
+responses:
+  utter_greet:
+    - text: "Hello! How can I assist you today at WUA?"
+  utter_goodbye:
+    - text: "Goodbye! Have a great day."
+  utter_thank_you:
+    - text: "You're welcome! Happy to help."
+  utter_out_of_scope:
+    - text: "Sorry, I can only answer questions related to WUA."

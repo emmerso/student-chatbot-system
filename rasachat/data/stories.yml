@@ -1,0 +1,86 @@
+version: "3.1"
+
+stories:
+
+- story: greet and ask about WUA
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_about_wua
+    - action: action_answer_wua_question
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: admission flow
+  steps:
+    - intent: ask_admission
+    - action: action_answer_wua_question
+    - intent: ask_fees_payment
+    - action: action_answer_wua_question
+    - intent: thank_you
+    - action: utter_thank_you
+
+- story: contact request
+  steps:
+    - intent: ask_contact_info
+    - action: action_answer_wua_question
+    - intent: affirm
+    - action: utter_thank_you
+
+- story: fallback search
+  steps:
+    - intent: nlu_fallback
+    - action: action_answer_wua_question
+
+# NEW: Stories for general questions using SerpAPI
+- story: general program inquiry
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_general_wua
+    - action: action_answer_wua_question
+    - intent: thank_you
+    - action: utter_thank_you
+
+- story: campus facilities inquiry
+  steps:
+    - intent: ask_general_wua
+    - action: action_answer_wua_question
+    - intent: ask_contact_info
+    - action: action_answer_wua_question
+
+- story: programs and admission
+  steps:
+    - intent: ask_general_wua
+    - action: action_answer_wua_question
+    - intent: ask_admission
+    - action: action_answer_wua_question
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: multiple general questions
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_general_wua
+    - action: action_answer_wua_question
+    - intent: ask_general_wua
+    - action: action_answer_wua_question
+    - intent: thank_you
+    - action: utter_thank_you
+
+- story: student gpa check
+  steps:
+    - intent: greet
+    - action: utter_greet
+    - intent: ask_student_records
+    - action: action_get_student_info
+    - intent: goodbye
+    - action: utter_goodbye
+
+- story: student auth and records
+  steps:
+    - intent: ask_student_records
+    - action: action_get_student_info
+    - intent: provide_student_name
+    - action: action_get_student_info    

@@ -1,0 +1,3020 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>University Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.13.1/font/bootstrap-icons.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    :root {
+      --primary-rgb: 0, 123, 255;
+      --primary-color: #007bff;
+      --secondary-color: #6c757d;
+      --success-color: #28a745;
+      --background-color: #f5f7fa;
+      --card-bg: #ffffff;
+      --text-color: #212529;
+      --border-color: #dee2e6;
+      --sidebar-bg: #f8f9fa;
+      --message-user-bg: #007bff;
+      --message-user-text: #ffffff;
+      --message-bot-bg: #e9ecef;
+      --message-bot-text: #212529;
+      --input-bg: #ffffff;
+      --shadow: 0px 4px 15px rgba(0,0,0,0.1);
+    }
+
+    [data-theme="dark"] {
+      --primary-color: #0d6efd;
+      --secondary-color: #5a6268;
+      --background-color: #121212;
+      --card-bg: #1e1e1e;
+      --text-color: #e0e0e0;
+      --border-color: #444;
+      --sidebar-bg: #252525;
+      --message-user-bg: #0d6efd;
+      --message-user-text: #ffffff;
+      --message-bot-bg: #2d2d2d;
+      --message-bot-text: #e0e0e0;
+      --input-bg: #2d2d2d;
+      --shadow: 0px 4px 15px rgba(0,0,0,0.3);
+    }
+
+    body {
+      background: var(--background-color);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .app-container {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 300px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 15px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-history {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .history-item {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background: var(--card-bg);
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .history-item:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    /* Language indicator styles */
+    .language-indicator {
+      background: rgba(var(--primary-rgb), 0.1);
+      color: var(--primary-color, #007bff);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+      cursor: help;
+    }
+
+    .language-indicator:hover {
+      background: rgba(var(--primary-rgb), 0.2);
+      transform: translateY(-1px);
+    }
+
+    .language-indicator i {
+      font-size: 14px;
+    }
+
+    /* Language support note */
+    .language-support-note {
+      text-align: center;
+      margin-top: 8px;
+      padding: 8px;
+      color: var(--text-muted, #6c757d);
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      opacity: 0.8;
+    }
+
+    .language-support-note i {
+      color: var(--primary-color, #007bff);
+    }
+
+    /* Dark theme support for language elements */
+    [data-theme="dark"] .language-indicator {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    [data-theme="dark"] .language-support-note {
+      color: #adb5bd;
+    }
+
+    /* Language detection animation */
+    .language-indicator.detecting {
+      animation: languagePulse 1.5s infinite;
+    }
+
+    @keyframes languagePulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .language-indicator span {
+        display: none;
+      }
+      
+      .language-support-note {
+        font-size: 10px;
+        padding: 6px;
+      }
+    }
+
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary-color), #0099ff);
+      color: white;
+      padding: 15px 20px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-header::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .accessibility-tools {
+      display: flex;
+      gap: 8px;
+    }
+
+    .chat-body {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+      background: var(--card-bg);
+    }
+
+    /* Enhanced Message Styles */
+    .message {
+      margin-bottom: 20px;
+      display: flex;
+      max-width: 85%;
+      animation: messageSlide 0.3s ease-out;
+    }
+
+    @keyframes messageSlide {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      margin-left: auto;
+      justify-content: flex-end;
+    }
+
+    .message .text {
+      padding: 14px 18px;
+      border-radius: 20px;
+      max-width: 100%;
+      word-wrap: break-word;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .message.user .text {
+      background: var(--message-user-bg);
+      color: var(--message-user-text);
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.bot .text {
+      background: var(--message-bot-bg);
+      color: var(--message-bot-text);
+      border-bottom-left-radius: 5px;
+    }
+
+    .message-time {
+      font-size: 0.7rem;
+      margin-top: 5px;
+      opacity: 0.7;
+      text-align: right;
+    }
+
+    .message.bot .message-time {
+      text-align: left;
+    }
+
+    /* Message Actions */
+    .message-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .message:hover .message-actions {
+      opacity: 1;
+    }
+
+    .message-action-btn {
+      background: rgba(0, 0, 0, 0.1);
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-color);
+    }
+
+    .message-action-btn:hover {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .chat-footer {
+      padding: 15px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      gap: 10px;
+      background: var(--card-bg);
+    }
+
+    /* Improved Input Fields */
+    .chat-footer input {
+      flex-grow: 1;
+      border-radius: 25px;
+      padding: 14px 20px;
+      border: 2px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .chat-footer input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .chat-footer button {
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .voice-btn.listening {
+      animation: pulse 1.5s infinite;
+      background-color: #dc3545 !important;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 100;
+      display: none;
+    }
+
+    /* Enhanced Typing Indicator */
+    .typing-indicator {
+      display: none;
+      padding: 12px 18px;
+      background: var(--message-bot-bg);
+      color: var(--message-bot-text);
+      border-radius: 20px;
+      margin-bottom: 15px;
+      max-width: fit-content;
+      border-bottom-left-radius: 8px;
+      font-style: italic;
+    }
+
+    .typing-indicator span {
+      height: 8px;
+      width: 8px;
+      background: var(--secondary-color);
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      animation: typing 1.3s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        z-index: 99;
+        transform: translateX(-100%);
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .sidebar-toggle {
+        display: block;
+      }
+      
+      .chat-header {
+        flex-direction: column;
+        padding: 10px;
+      }
+    }
+
+    /* High contrast mode */
+    .high-contrast {
+      --primary-color: #000000;
+      --secondary-color: #000000;
+      --background-color: #ffffff;
+      --card-bg: #ffffff;
+      --text-color: #000000;
+      --border-color: #000000;
+      --sidebar-bg: #f0f0f0;
+      --message-user-bg: #000000;
+      --message-user-text: #ffffff;
+      --message-bot-bg: #f0f0f0;
+      --message-bot-text: #000000;
+      --input-bg: #ffffff;
+      --shadow: 0 0 0 2px #000000;
+    }
+
+    /* Text size adjustments */
+    .text-large {
+      font-size: 1.2rem;
+    }
+
+    .text-x-large {
+      font-size: 1.4rem;
+    }
+    
+    /* Enhanced Accessibility Buttons */
+    .accessibility-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .accessibility-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Enhanced Scrollbars */
+    .chat-body::-webkit-scrollbar,
+    .bookmarks-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-body::-webkit-scrollbar-track,
+    .bookmarks-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb,
+    .bookmarks-content::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 10px;
+    }
+
+    .chat-body::-webkit-scrollbar-thumb:hover,
+    .bookmarks-content::-webkit-scrollbar-thumb:hover {
+      background: var(--secondary-color);
+    }
+
+    /* Enhanced Bookmarks Panel Styles */
+    #bookmarks-panel {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 400px;
+      height: 100%;
+      background: var(--card-bg);
+      border-left: 1px solid var(--border-color);
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #bookmarks-panel.open {
+      right: 0;
+    }
+
+    .bookmarks-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(45deg, var(--primary-color), #00c6ff);
+      color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .bookmarks-content {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    /* Enhanced Bookmark Controls */
+    .bookmark-controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 0 4px;
+    }
+
+    #bookmark-search {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    #bookmark-search:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    #category-filter {
+      padding: 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--input-bg);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    #category-filter:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    /* Enhanced Bookmark Cards */
+    .bookmark-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bookmark-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary-color);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .bookmark-card:hover::before {
+      opacity: 1;
+    }
+
+    .bookmark-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    }
+
+    .bookmark-card.pinned {
+      border-left: 4px solid var(--success-color);
+      background: rgba(40, 167, 69, 0.05);
+    }
+
+    .bookmark-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .bookmark-category {
+      background: var(--primary-color);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .pin-icon {
+      font-size: 14px;
+    }
+
+    .remove-btn {
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .remove-btn:hover {
+      transform: scale(1.1);
+      background: #d32f2f;
+    }
+
+    .bookmark-title {
+      margin: 12px 0;
+      color: var(--text-color);
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    .bookmark-message,
+    .bookmark-response {
+      margin: 10px 0;
+      font-size: 14px;
+      color: var(--secondary-color);
+      line-height: 1.4;
+    }
+
+    .bookmark-message strong,
+    .bookmark-response strong {
+      color: var(--primary-color);
+    }
+
+    .bookmark-notes {
+      background: rgba(255, 193, 7, 0.1);
+      padding: 10px;
+      border-left: 3px solid #ffc107;
+      margin: 12px 0;
+      font-size: 13px;
+      border-radius: 4px;
+    }
+
+    .bookmark-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .bookmark-date {
+      font-size: 11px;
+      color: var(--secondary-color);
+      font-weight: 500;
+    }
+
+    .pin-btn {
+      background: none;
+      border: 2px solid var(--success-color);
+      color: var(--success-color);
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pin-btn:hover {
+      background: var(--success-color);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .no-bookmarks {
+      text-align: center;
+      color: var(--secondary-color);
+      padding: 60px 20px;
+      font-style: italic;
+      font-size: 14px;
+    }
+
+    /* Enhanced Notification */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      color: white;
+      opacity: 0;
+      transform: translateX(100px);
+      transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 1000;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .notification.success {
+      background: var(--success-color);
+    }
+
+    .notification.error {
+      background: #f44336;
+    }
+
+    .notification.info {
+      background: var(--primary-color);
+    }
+
+    /* Enhanced Bookmark Button */
+    .bookmark-btn {
+      background: none;
+      border: 2px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 8px;
+      transition: all 0.3s;
+      color: var(--text-color);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bookmark-btn:hover {
+      background: var(--message-bot-bg);
+      border-color: var(--primary-color);
+      transform: translateY(-1px);
+    }
+
+    .bookmark-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Overlay for when bookmarks panel is open */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      display: none;
+      backdrop-filter: blur(2px);
+    }
+
+    .overlay.show {
+      display: block;
+    }
+
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+      #bookmarks-panel {
+        width: 100vw;
+        right: -100vw;
+      }
+      
+      .chat-header {
+        padding: 12px 15px;
+      }
+      
+      .header-controls {
+        gap: 6px;
+      }
+      
+      .accessibility-btn {
+        width: 38px;
+        height: 38px;
+      }
+      
+      .message {
+        max-width: 90%;
+      }
+      
+      .chat-footer {
+        padding: 12px;
+      }
+      
+      .chat-footer input {
+        padding: 12px 16px;
+      }
+      
+      .bookmarks-content {
+        padding: 15px;
+      }
+    }
+
+    /* Safe area insets for modern mobile devices */
+    @supports (padding: max(0px)) {
+      .chat-footer {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+        padding-bottom: max(15px, env(safe-area-inset-bottom));
+      }
+    }
+
+    /* Improved dark mode contrast */
+    [data-theme="dark"] .message.bot .text {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+    }
+
+    [data-theme="dark"] .bookmark-card {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+    }
+/* Gamification System Styles */
+  
+  /* Badge Display Panel */
+  #badges-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100%;
+    background: var(--card-bg);
+    border-left: 1px solid var(--border-color);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #badges-panel.open {
+    right: 0;
+  }
+
+  .badges-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+
+  .badges-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  /* Achievement Badges */
+  .badge-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+
+  .badge {
+    text-align: center;
+    padding: 15px 10px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .badge.locked {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
+
+  .badge.unlocked {
+    border-color: #ffd93d;
+    box-shadow: 0 4px 12px rgba(255, 217, 61, 0.3);
+  }
+
+  .badge-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .badge-name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--text-color);
+  }
+
+  .badge-description {
+    font-size: 10px;
+    color: var(--secondary-color);
+    line-height: 1.3;
+  }
+
+  .badge-progress {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .badge-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    transition: width 0.5s ease;
+  }
+
+  /* Progress Overview */
+  .progress-overview {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+  }
+
+  .progress-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-item {
+    text-align: center;
+    padding: 15px;
+    border-radius: 8px;
+    background: rgba(var(--primary-rgb, 0, 123, 255), 0.1);
+  }
+
+  .stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--secondary-color);
+  }
+
+  /* Achievement Categories */
+  .category-section {
+    margin-bottom: 25px;
+  }
+
+  .category-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Achievement Notification */
+  .achievement-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: linear-gradient(135deg, #ffd93d, #ff6b6b);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    z-index: 1100;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .achievement-notification.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .achievement-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .achievement-content {
+    flex-grow: 1;
+  }
+
+  .achievement-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+
+  .achievement-description {
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  /* Gamification Controls */
+  .gamification-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+
+  .gamification-btn.has-badge::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: #ff6b6b;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  /* Daily Streak */
+  .streak-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .streak-count {
+    background: #ff6b6b;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .streak-label {
+    font-size: 14px;
+    color: var(--text-color);
+  }
+
+  /* Level System */
+  .level-container {
+    margin-bottom: 20px;
+  }
+
+  .level-bar {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .level-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    transition: width 0.5s ease;
+  }
+
+  .level-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--secondary-color);
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    #badges-panel {
+      width: 100vw;
+      right: -100vw;
+    }
+    
+    .badge-container {
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 10px;
+    }
+    
+    .progress-stats {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    
+    .achievement-notification {
+      width: 95%;
+      padding: 12px 20px;
+    }
+  }
+
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar for chat history -->
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>Chat History</h2>
+        <button class="btn btn-sm btn-outline-secondary" id="clear-history">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+      <div class="chat-history" id="chat-history">
+        <!-- History items will be added here dynamically -->
+      </div>
+    </div>
+
+    <!-- Main chat area -->
+    <div class="main-content">
+      
+      <button class="btn btn-primary sidebar-toggle" id="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      
+      
+      <div class="chat-header">
+        <span>🎓 University Chatbot</span>
+        <div class="header-controls">
+          <div class="accessibility-tools">
+            <!-- Bookmarks Button -->
+            <button class="accessibility-btn" id="bookmarks-toggle" title="My Bookmarks">
+              <i class="bi bi-bookmarks"></i>
+            </button>
+            <button class="gamification-btn" id="badges-toggle" title="My Achievements">
+  <i class="fas fa-trophy"></i>
+</button>
+            
+            <!-- Notification Icon -->
+            <div id="notification-container" style="position: relative; display: inline-block; cursor: pointer;">
+              <i class="bi bi-bell" id="notification-icon" style="font-size: 24px;"></i>
+              <span id="notification-count" 
+                    style="display:none; position: absolute; top: -5px; right: -5px; 
+                          background: red; color: white; border-radius: 50%; 
+                          padding: 2px 6px; font-size: 12px;">0</span>
+            </div>
+
+            <div class="language-controls">
+              <div id="language-indicator" class="language-indicator" title="Detected language">
+                <i class="fas fa-language"></i>
+                <span>Auto-Detect</span>
+              </div>
+            </div>
+            
+            <button class="accessibility-btn" id="text-size-toggle" title="Adjust text size">
+              <i class="fas fa-text-height"></i>
+            </button>
+            <button class="accessibility-btn" id="high-contrast-toggle" title="High contrast mode">
+              <i class="fas fa-adjust"></i>
+            </button>
+            <button class="accessibility-btn" id="read-last-message" title="Read last message">
+              <i class="fas fa-volume-up"></i>
+            </button>
+          </div>
+          <button class="btn btn-sm btn-light me-2" id="theme-toggle">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button class="btn btn-sm btn-light" id="reset-chat">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="chat-body" id="chat-body">
+        <div class="typing-indicator" id="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <!-- Messages will be added here dynamically -->
+      </div>
+      
+      <div class="chat-footer">
+        <input type="text" id="message" placeholder="Type your message in English or Shona..." aria-label="Type your message in English or Shona">
+        <button id="voice-btn" class="btn btn-outline-primary voice-btn" title="Voice input">
+          <i class="fas fa-microphone"></i>
+        </button>
+        <button id="send" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      <div class="language-support-note">
+        <i class="fas fa-globe"></i> Supports English and Shona • Automatically detects your language
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookmarks Panel -->
+  <div id="bookmarks-panel">
+    <div class="bookmarks-header">
+      <h3 class="mb-0"><i class="bi bi-bookmarks me-2"></i>My Bookmarks</h3>
+      <button class="btn-close btn-close-white" id="close-bookmarks"></button>
+    </div>
+    <div class="bookmarks-content">
+      <div class="bookmark-controls">
+        <input type="text" id="bookmark-search" placeholder="Search bookmarks...">
+        <select id="category-filter">
+          <option value="">All Categories</option>
+          <option value="admissions">Admissions</option>
+          <option value="fees">Fees & Payment</option>
+          <option value="academics">Academic Info</option>
+          <option value="lms">LMS Related</option>
+          <option value="general">General</option>
+        </select>
+      </div>
+      <div id="bookmarks-container"></div>
+    </div>
+  </div>
+<div id="badges-panel">
+  <div class="badges-header">
+    <h3 class="mb-0"><i class="fas fa-trophy me-2"></i>My Achievements</h3>
+    <button class="btn-close btn-close-white" id="close-badges"></button>
+  </div>
+  <div class="badges-content">
+    <!-- Progress Overview -->
+    <div class="progress-overview">
+      <div class="streak-container">
+        <span class="streak-count" id="current-streak">0 days</span>
+        <span class="streak-label">Current Streak</span>
+      </div>
+      
+      <div class="level-container">
+        <div class="level-info">
+          <span>Level <span id="current-level">1</span></span>
+          <span><span id="current-xp">0</span>/<span id="next-level-xp">100</span> XP</span>
+        </div>
+        <div class="level-bar">
+          <div class="level-progress" id="level-progress" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <div class="progress-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="total-badges">0</div>
+          <div class="stat-label">Badges Earned</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="total-conversations">0</div>
+          <div class="stat-label">Conversations</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="total-bookmarks">0</div>
+          <div class="stat-label">Bookmarks</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Achievement Categories -->
+    <div class="category-section">
+      <h4 class="category-title"><i class="fas fa-comments"></i> Conversation Badges</h4>
+      <div class="badge-container" id="conversation-badges">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <div class="category-section">
+      <h4 class="category-title"><i class="fas fa-calendar-check"></i> Daily Usage Badges</h4>
+      <div class="badge-container" id="daily-badges">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <div class="category-section">
+      <h4 class="category-title"><i class="fas fa-bookmark"></i> Bookmark Badges</h4>
+      <div class="badge-container" id="bookmark-badges">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <div class="category-section">
+      <h4 class="category-title"><i class="fas fa-heart"></i> Help-Seeking Badges</h4>
+      <div class="badge-container" id="help-badges">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Overlay for when bookmarks panel is open -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+<script>
+  // DOM Elements
+const chatBody = document.getElementById("chat-body");
+const messageInput = document.getElementById("message");
+const sendBtn = document.getElementById("send");
+const themeToggle = document.getElementById("theme-toggle");
+const resetChatBtn = document.getElementById("reset-chat");
+const sidebar = document.getElementById("sidebar");
+const sidebarToggle = document.getElementById("sidebar-toggle");
+const chatHistory = document.getElementById("chat-history");
+const clearHistoryBtn = document.getElementById("clear-history");
+const textSizeToggle = document.getElementById("text-size-toggle");
+const highContrastToggle = document.getElementById("high-contrast-toggle");
+const readLastMessageBtn = document.getElementById("read-last-message");
+const voiceBtn = document.getElementById("voice-btn");
+
+// State variables
+let currentChat = [];
+let chatSessions = [];
+let currentTheme = 'light';
+let textSizeLevel = 0;
+let highContrastMode = false;
+let recognition = null;
+let isListening = false;
+let typingIndicator = document.getElementById("typing-indicator");
+let currentConversationId = null;
+
+// Multilingual state variables
+let currentLanguage = 'en';
+let languageIndicator = null;
+
+// Bookmarks functionality
+const bookmarksToggle = document.getElementById('bookmarks-toggle');
+const bookmarksPanel = document.getElementById('bookmarks-panel');
+const closeBookmarks = document.getElementById('close-bookmarks');
+const overlay = document.getElementById('overlay');
+const bookmarksContainer = document.getElementById('bookmarks-container');
+const bookmarkSearch = document.getElementById('bookmark-search');
+const categoryFilter = document.getElementById('category-filter');
+const notification = document.getElementById('notification');
+
+// Bookmarks data - loaded from localStorage
+let bookmarks = JSON.parse(localStorage.getItem('chatBookmarks')) || [];
+
+// Initialize the chat
+function init() {
+  loadChatSessions();
+  setupEventListeners();
+  initSpeechRecognition();
+  setFocusToInput();
+  initializeLanguageSupport();
+  
+  // Add welcome message if it's a new chat
+  if (currentChat.length === 0) {
+    appendMessage('bot', getWelcomeMessage('en'));
+    saveCurrentChat();
+  }
+}
+
+// Initialize language support
+function initializeLanguageSupport() {
+  languageIndicator = document.getElementById('language-indicator');
+  if (languageIndicator) {
+    updateLanguageIndicator('en', 'Auto-Detect');
+  }
+}
+
+// Update language indicator
+function updateLanguageIndicator(language, status = null) {
+  if (!languageIndicator) return;
+  
+  const languageNames = { 'en': 'English', 'sn': 'Shona' };
+  const span = languageIndicator.querySelector('span');
+  if (span) {
+    span.textContent = status || languageNames[language] || language;
+  }
+  if (status) {
+    languageIndicator.classList.add('detecting');
+    setTimeout(() => languageIndicator.classList.remove('detecting'), 1500);
+  }
+  currentLanguage = language;
+}
+
+// Get welcome message
+function getWelcomeMessage(language = 'en') {
+  const welcomeMessages = {
+    'en': "Hello! I'm your university assistant. I can help you in English or Shona. How can I assist you today?",
+    'sn': "Mhoro! Ndiri mubatsiri weyunivhesiti. Ndinogona kukubatsira muChirungu kana muchiShona. Ndingakubatsirei nhasi?"
+  };
+  return welcomeMessages[language] || welcomeMessages['en'];
+}
+
+// Set up event listeners
+function setupEventListeners() {
+  sendBtn.addEventListener("click", sendMessage);
+  messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+  themeToggle.addEventListener("click", toggleTheme);
+  resetChatBtn.addEventListener("click", resetChat);
+  sidebarToggle.addEventListener("click", toggleSidebar);
+  clearHistoryBtn.addEventListener("click", clearChatHistory);
+  textSizeToggle.addEventListener("click", cycleTextSize);
+  highContrastToggle.addEventListener("click", toggleHighContrast);
+  readLastMessageBtn.addEventListener("click", readLastMessage);
+  
+  // Fixed voice button event listener
+  if (voiceBtn) {
+    voiceBtn.addEventListener("click", toggleVoiceInput);
+  }
+  
+  // Bookmarks event listeners
+  bookmarksToggle.addEventListener('click', toggleBookmarksPanel);
+  closeBookmarks.addEventListener('click', toggleBookmarksPanel);
+  overlay.addEventListener('click', toggleBookmarksPanel);
+  bookmarkSearch.addEventListener('input', loadBookmarks);
+  categoryFilter.addEventListener('change', loadBookmarks);
+  
+  document.addEventListener('click', event => {
+    if (window.innerWidth < 992 && !sidebar.contains(event.target) && 
+        !sidebarToggle.contains(event.target) && sidebar.classList.contains('open')) {
+      toggleSidebar();
+    }
+  });
+}
+
+// Improved Speech Recognition initialization
+function initSpeechRecognition() {
+  // Check if speech recognition is supported
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    console.warn('Speech recognition not supported');
+    if (voiceBtn) {
+      voiceBtn.disabled = true;
+      voiceBtn.title = "Voice input not supported in your browser";
+      voiceBtn.style.opacity = '0.5';
+    }
+    return;
+  }
+
+  try {
+    // Create recognition instance
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    
+    // Configure recognition settings
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+    
+    console.log('Speech recognition configured:', {
+      continuous: recognition.continuous,
+      interimResults: recognition.interimResults,
+      lang: recognition.lang
+    });
+    
+    // Handle results
+    recognition.onresult = function(event) {
+      console.log('Speech recognition result event:', event);
+      
+      let finalTranscript = '';
+      let interimTranscript = '';
+      
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        const confidence = event.results[i][0].confidence;
+        
+        console.log('Transcript:', transcript, 'Final:', event.results[i].isFinal, 'Confidence:', confidence);
+        
+        if (event.results[i].isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+      
+      // Update input with final transcript or show interim results
+      if (finalTranscript.trim()) {
+        console.log('Final transcript:', finalTranscript.trim());
+        messageInput.value = finalTranscript.trim();
+        setFocusToInput();
+        showStatusMessage('Speech recognized: "' + finalTranscript.trim() + '"', 'success');
+        // Automatically stop listening after getting final result
+        stopListening();
+      } else if (interimTranscript.trim()) {
+        // Show interim results in the input field too
+        console.log('Interim transcript:', interimTranscript.trim());
+        messageInput.value = interimTranscript.trim();
+        messageInput.placeholder = "Listening... (interim: " + interimTranscript.trim() + ")";
+        showStatusMessage('Listening... "' + interimTranscript.trim() + '"', 'info');
+      }
+    };
+    
+    // Handle speech start
+    recognition.onspeechstart = function() {
+      console.log('Speech detected');
+    };
+    
+    // Handle speech end
+    recognition.onspeechend = function() {
+      console.log('Speech ended - but keeping recognition active');
+      // Don't stop immediately, let it continue listening
+    };
+    
+    // Handle recognition start
+    recognition.onstart = function() {
+      console.log('Speech recognition started');
+      isListening = true;
+      if (voiceBtn) {
+        voiceBtn.classList.add("listening");
+      }
+      messageInput.placeholder = "Listening... Speak now";
+    };
+    
+    // Handle recognition end
+    recognition.onend = function() {
+      console.log('Speech recognition ended');
+      isListening = false;
+      if (voiceBtn) {
+        voiceBtn.classList.remove("listening");
+      }
+      messageInput.placeholder = "Type your message...";
+      
+      // If we have text in the input, don't restart
+      if (!messageInput.value.trim()) {
+        showStatusMessage("No speech detected. Click the microphone to try again.", 'info');
+      }
+    };
+    
+    // Handle errors
+    recognition.onerror = function(event) {
+      console.error('Speech recognition error:', event.error);
+      
+      let message;
+      switch(event.error) {
+        case 'no-speech':
+          message = currentLanguage === 'sn' 
+            ? "Handina kunzwa izwi. Ndapota taurai zvakare." 
+            : "No speech detected. Please try speaking again.";
+          break;
+        case 'audio-capture':
+          message = currentLanguage === 'sn' 
+            ? "Mikrofoni haina kuwanikwa. Tarisa zvigadziriso zvako." 
+            : "No microphone detected. Please check your device settings.";
+          break;
+        case 'not-allowed':
+          message = currentLanguage === 'sn' 
+            ? "Mvumo yekushandisa maikorofoni yarambwa." 
+            : "Microphone access was denied. Please allow microphone access.";
+          break;
+        case 'network':
+          message = currentLanguage === 'sn'
+            ? "Dambudziko rekubatana. Tarisa internet yako."
+            : "Network error. Please check your internet connection.";
+          break;
+        default:
+          message = currentLanguage === 'sn'
+            ? "Pamusoroi, handina kunzwisisa izwi renyu. Edza zvakare."
+            : "Sorry, I couldn't understand your speech. Please try again.";
+      }
+      
+      // Show error message briefly
+      showStatusMessage(message, 'error');
+      
+      // Stop listening
+      stopListening();
+    };
+    
+    console.log('Speech recognition initialized successfully');
+    
+  } catch (error) {
+    console.error('Failed to initialize speech recognition:', error);
+    if (voiceBtn) {
+      voiceBtn.disabled = true;
+      voiceBtn.title = "Voice input initialization failed";
+      voiceBtn.style.opacity = '0.5';
+    }
+  }
+}
+
+// Toggle voice input
+function toggleVoiceInput() {
+  if (!recognition) {
+    showStatusMessage("Speech recognition not available", 'error');
+    return;
+  }
+  
+  if (isListening) {
+    stopListening();
+  } else {
+    startListening();
+  }
+}
+
+// Start listening
+function startListening() {
+  if (!recognition || isListening) return;
+  
+  console.log('Attempting to start listening...');
+  
+  try {
+    // Clear any previous input
+    messageInput.value = '';
+    messageInput.placeholder = 'Click Allow when browser asks for microphone access...';
+    
+    // Start recognition directly - browser will handle permission
+    recognition.start();
+    console.log('Recognition start() called');
+    
+    showStatusMessage('Starting voice input...', 'info');
+      
+  } catch (error) {
+    console.error('Error starting speech recognition:', error);
+    showStatusMessage("Failed to start voice input: " + error.message, 'error');
+  }
+}
+
+// Stop listening
+function stopListening() {
+  if (recognition && isListening) {
+    recognition.stop();
+  }
+  isListening = false;
+  if (voiceBtn) {
+    voiceBtn.classList.remove("listening");
+  }
+  messageInput.placeholder = "Type your message...";
+}
+
+// Show status message
+function showStatusMessage(message, type = 'info') {
+  // Create or get status message element
+  let statusDiv = document.getElementById('voice-status');
+  if (!statusDiv) {
+    statusDiv = document.createElement('div');
+    statusDiv.id = 'voice-status';
+    statusDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 15px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
+      z-index: 1000;
+      transition: opacity 0.3s ease;
+    `;
+    document.body.appendChild(statusDiv);
+  }
+  
+  // Set message and style based on type
+  statusDiv.textContent = message;
+  statusDiv.className = type;
+  
+  if (type === 'error') {
+    statusDiv.style.backgroundColor = '#dc3545';
+  } else if (type === 'success') {
+    statusDiv.style.backgroundColor = '#28a745';
+  } else {
+    statusDiv.style.backgroundColor = '#007bff';
+  }
+  
+  statusDiv.style.opacity = '1';
+  
+  // Hide after 3 seconds
+  setTimeout(() => {
+    statusDiv.style.opacity = '0';
+    setTimeout(() => {
+      if (statusDiv.parentNode) {
+        statusDiv.parentNode.removeChild(statusDiv);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Enhanced appendMessage function with copy and bookmark functionality
+function appendMessage(sender, text, conversationId = null, confidence = null, isFallback = false, isMentalHealth = false, concernLevel = null) {
+  const msgDiv = document.createElement("div");
+  msgDiv.classList.add("message", sender);
+  msgDiv.dataset.conversationId = conversationId;
+  
+  if (isMentalHealth) {
+    msgDiv.classList.add("mental-health-message");
+    msgDiv.dataset.concernLevel = concernLevel;
+  }
+  
+  const textDiv = document.createElement("div");
+  textDiv.classList.add("text");
+  textDiv.textContent = text;
+  textDiv.setAttribute('role', sender === 'user' ? 'sent-message' : 'received-message');
+  
+  const timeDiv = document.createElement("div");
+  timeDiv.classList.add("message-time");
+  timeDiv.textContent = getCurrentTime();
+  
+  msgDiv.appendChild(textDiv);
+  msgDiv.appendChild(timeDiv);
+  
+  // Add message actions (copy button)
+  const actionsDiv = document.createElement("div");
+  actionsDiv.className = "message-actions";
+  
+  const copyBtn = document.createElement("button");
+  copyBtn.className = "message-action-btn copy-btn";
+  copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+  copyBtn.title = 'Copy message';
+  copyBtn.onclick = () => {
+    navigator.clipboard.writeText(text);
+    showNotification('Message copied to clipboard', 'info');
+  };
+  
+  actionsDiv.appendChild(copyBtn);
+  msgDiv.appendChild(actionsDiv);
+  
+  // Add bookmark button for bot messages
+  if (sender === 'bot') {
+    const bookmarkBtn = document.createElement("button");
+    bookmarkBtn.className = "bookmark-btn";
+    bookmarkBtn.innerHTML = '<i class="bi bi-bookmark"></i> Bookmark';
+    bookmarkBtn.onclick = () => {
+      const userMessage = currentChat[currentChat.length - 1]?.text || 'Previous question';
+      // Create a better title for the bookmark
+      const bookmarkTitle = userMessage.length > 50 
+        ? userMessage.substring(0, 50) + '...' 
+        : userMessage;
+      
+      addBookmark(
+        bookmarkTitle, 
+        userMessage, 
+        text,
+        'general'
+      );
+    };
+    msgDiv.appendChild(bookmarkBtn);
+  }
+  
+  // Add bookmark button for user messages too
+  if (sender === 'user') {
+    const bookmarkBtn = document.createElement("button");
+    bookmarkBtn.className = "bookmark-btn";
+    bookmarkBtn.innerHTML = '<i class="bi bi-bookmark"></i> Bookmark Question';
+    bookmarkBtn.onclick = () => {
+      const bookmarkTitle = text.length > 50 
+        ? text.substring(0, 50) + '...' 
+        : text;
+      
+      addBookmark(
+        bookmarkTitle, 
+        text, 
+        'Question saved for later',
+        'general'
+      );
+    };
+    msgDiv.appendChild(bookmarkBtn);
+  }
+  
+  // Add mental health indicator if applicable
+  if (isMentalHealth && sender === 'bot') {
+    const mentalHealthIndicator = createMentalHealthIndicator(concernLevel);
+    msgDiv.appendChild(mentalHealthIndicator);
+  }
+  
+  // Add feedback controls for bot messages
+  if (sender === 'bot' && conversationId) {
+    const feedbackDiv = createFeedbackControls(conversationId, isFallback, isMentalHealth);
+    msgDiv.appendChild(feedbackDiv);
+    currentConversationId = conversationId;
+  }
+  
+  chatBody.appendChild(msgDiv);
+  chatBody.scrollTop = chatBody.scrollHeight;
+  currentChat.push({ 
+    sender, text, time: new Date().toISOString(),
+    conversationId, confidence, isFallback, isMentalHealth, concernLevel
+  });
+  
+  // Smooth scroll to bottom
+  setTimeout(() => {
+    chatBody.scrollTo({
+      top: chatBody.scrollHeight,
+      behavior: 'smooth'
+    });
+  }, 100);
+}
+
+// Typing indicator
+function showTypingIndicator() { 
+  if (typingIndicator) {
+    typingIndicator.style.display = 'block'; 
+    chatBody.scrollTop = chatBody.scrollHeight; 
+  }
+}
+
+function hideTypingIndicator() { 
+  if (typingIndicator) {
+    typingIndicator.style.display = 'none'; 
+  }
+}
+
+// Updated sendMessage function with mental health support
+function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text) return;
+  
+  // Stop listening if active
+  if (isListening) {
+    stopListening();
+  }
+  
+  appendMessage("user", text);
+  messageInput.value = "";
+  setFocusToInput();
+  showTypingIndicator();
+  updateLanguageIndicator(currentLanguage, 'Detecting...');
+  
+  fetch("/multilingual-chat/", {
+    method: "POST",
+    headers: { 
+      "X-CSRFToken": getCookie("csrftoken"), 
+      "Content-Type": "application/json" 
+    },
+    body: JSON.stringify({ "message": text })
+  })
+  .then(res => res.json())
+  .then(data => {
+    hideTypingIndicator();
+    if (data.response) {
+      // Enhanced with mental health detection
+      const isMentalHealth = data.mental_health_detected || false;
+      const concernLevel = data.concern_level || null;
+      
+      appendMessage(
+        "bot", data.response, data.conversation_id, 
+        data.confidence_score, data.is_fallback, 
+        isMentalHealth, concernLevel
+      );
+      
+      if (isMentalHealth) {
+        showMentalHealthNotice(concernLevel, data.detected_language || 'en');
+      }
+      
+      if (data.detected_language) updateLanguageIndicator(data.detected_language);
+      saveCurrentChat();
+    } else if (data.error) {
+      const errorMessages = { 
+        'en': "Sorry, I'm having trouble right now. Please try again.", 
+        'sn': "Pamusoroi, ndiri kunetsa izvozvi. Edza zvakare." 
+      };
+      appendMessage("bot", errorMessages[currentLanguage] || errorMessages['en']);
+      updateLanguageIndicator(currentLanguage);
+    }
+  })
+  .catch(error => {
+    hideTypingIndicator();
+    console.error('Error:', error);
+    const errorMessages = { 
+      'en': "Sorry, I'm having trouble connecting right now. Please try again.", 
+      'sn': "Pamusoroi, ndiri kunetsa kubatana izvozvi. Edza zvakare." 
+    };
+    appendMessage("bot", errorMessages[currentLanguage] || errorMessages['en']);
+    updateLanguageIndicator(currentLanguage);
+    saveCurrentChat();
+  });
+}
+
+// Theme toggle
+function toggleTheme() {
+  if (currentTheme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    currentTheme = 'dark';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    currentTheme = 'light';
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+// Sidebar
+function toggleSidebar() { 
+  if (sidebar) {
+    sidebar.classList.toggle('open'); 
+  }
+}
+
+// Reset chat
+function resetChat() {
+  // Stop listening if active
+  if (isListening) {
+    stopListening();
+  }
+  
+  if (currentChat.length > 0) saveCurrentChat();
+  currentChat = [];
+  chatBody.innerHTML = '<div class="typing-indicator" id="typing-indicator"><span></span><span></span><span></span></div>';
+  typingIndicator = document.getElementById("typing-indicator");
+  if (typingIndicator) {
+    typingIndicator.style.display = 'none';
+  }
+  appendMessage('bot', getWelcomeMessage(currentLanguage));
+  updateLanguageIndicator('en', 'Auto-Detect');
+  saveCurrentChat();
+}
+
+// Save chat history
+function saveCurrentChat() {
+  if (currentChat.length === 0) return;
+  const chatTitle = currentChat.find(msg => msg.sender === 'user')?.text || 'New Chat';
+  const chatData = {
+    id: Date.now(),
+    title: chatTitle.length > 30 ? chatTitle.substring(0, 30) + '...' : chatTitle,
+    messages: [...currentChat],
+    timestamp: new Date().toISOString()
+  };
+  const existingIndex = chatSessions.findIndex(session =>
+    session.messages.length === currentChat.length && 
+    session.messages.every((msg, i) => msg.sender === currentChat[i].sender && msg.text === currentChat[i].text)
+  );
+  if (existingIndex === -1) chatSessions.unshift(chatData);
+  else chatSessions[existingIndex] = chatData;
+  if (chatSessions.length > 20) chatSessions = chatSessions.slice(0, 20);
+  localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+  renderChatHistory();
+}
+
+// Load chat sessions
+function loadChatSessions() {
+  const savedSessions = localStorage.getItem('chatSessions');
+  if (savedSessions) {
+    chatSessions = JSON.parse(savedSessions);
+    renderChatHistory();
+    if (chatSessions.length > 0) loadChat(chatSessions[0].id);
+  }
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') toggleTheme();
+}
+
+// Render history
+function renderChatHistory() {
+  if (!chatHistory) return;
+  
+  chatHistory.innerHTML = '';
+  if (chatSessions.length === 0) {
+    chatHistory.innerHTML = '<div class="text-center p-3">No chat history yet</div>';
+    return;
+  }
+  chatSessions.forEach(session => {
+    const historyItem = document.createElement('div');
+    historyItem.classList.add('history-item');
+    historyItem.innerHTML = `<div class="fw-bold">${session.title}</div><div class="small text-muted">${formatDate(session.timestamp)}</div>`;
+    historyItem.addEventListener('click', () => { 
+      loadChat(session.id); 
+      if (window.innerWidth < 992) toggleSidebar(); 
+    });
+    chatHistory.appendChild(historyItem);
+  });
+}
+
+// Load chat
+function loadChat(chatId) {
+  // Stop listening if active
+  if (isListening) {
+    stopListening();
+  }
+  
+  const session = chatSessions.find(s => s.id === chatId);
+  if (!session) return;
+  currentChat = session.messages;
+  chatBody.innerHTML = '<div class="typing-indicator" id="typing-indicator"><span></span><span></span><span></span></div>';
+  typingIndicator = document.getElementById("typing-indicator");
+  if (typingIndicator) {
+    typingIndicator.style.display = 'none';
+  }
+  currentChat.forEach(msg => {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message", msg.sender);
+    const textDiv = document.createElement("div");
+    textDiv.classList.add("text");
+    textDiv.textContent = msg.text;
+    const timeDiv = document.createElement("div");
+    timeDiv.classList.add("message-time");
+    timeDiv.textContent = formatTime(msg.time);
+    msgDiv.appendChild(textDiv);
+    msgDiv.appendChild(timeDiv);
+    chatBody.appendChild(msgDiv);
+  });
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+// Clear history
+function clearChatHistory() {
+  const confirmMessages = { 
+    'en': 'Are you sure you want to clear all chat history?', 
+    'sn': 'Muri chete here kuti munoda kubvisa zvose zvakachengetwa?' 
+  };
+  if (confirm(confirmMessages[currentLanguage] || confirmMessages['en'])) {
+    chatSessions = [];
+    localStorage.removeItem('chatSessions');
+    renderChatHistory();
+    resetChat();
+  }
+}
+
+// Text size
+function cycleTextSize() {
+  textSizeLevel = (textSizeLevel + 1) % 3;
+  document.body.classList.remove('text-large', 'text-x-large');
+  if (textSizeLevel === 1) document.body.classList.add('text-large');
+  else if (textSizeLevel === 2) document.body.classList.add('text-x-large');
+  const sizes = ['normal', 'large', 'extra large'];
+  announceAccessibilityChange(`Text size set to ${sizes[textSizeLevel]}`);
+}
+
+// High contrast
+function toggleHighContrast() {
+  highContrastMode = !highContrastMode;
+  if (highContrastMode) {
+    document.body.classList.add('high-contrast');
+    announceAccessibilityChange('High contrast mode enabled');
+  } else {
+    document.body.classList.remove('high-contrast');
+    announceAccessibilityChange('High contrast mode disabled');
+  }
+}
+
+// Read last message
+function readLastMessage() {
+  const messages = chatBody.querySelectorAll('.message');
+  if (messages.length > 0) {
+    const lastMessage = messages[messages.length - 1];
+    const text = lastMessage.querySelector('.text').textContent;
+    const sender = lastMessage.classList.contains('user') ? 'You said' : 'Bot said';
+    const utterance = new SpeechSynthesisUtterance(`${sender}: ${text}`);
+    utterance.lang = 'en-US';
+    window.speechSynthesis.speak(utterance);
+  }
+}
+
+// Utils
+function getCurrentTime() { 
+  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+}
+
+function formatDate(dateString) { 
+  const date = new Date(dateString); 
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+}
+
+function formatTime(dateString) { 
+  const date = new Date(dateString); 
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+}
+
+function setFocusToInput() { 
+  if (messageInput) {
+    messageInput.focus(); 
+  }
+}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function announceAccessibilityChange(message) {
+  const announcer = document.getElementById('a11y-announcer') || createAnnouncer();
+  announcer.textContent = message;
+}
+
+function createAnnouncer() {
+  const announcer = document.createElement('div');
+  announcer.id = 'a11y-announcer';
+  announcer.setAttribute('aria-live', 'polite');
+  announcer.setAttribute('aria-atomic', 'true');
+  announcer.style.position = 'absolute';
+  announcer.style.left = '-10000px';
+  announcer.style.width = '1px';
+  announcer.style.height = '1px';
+  announcer.style.overflow = 'hidden';
+  document.body.appendChild(announcer);
+  return announcer;
+}
+
+// New functions for mental health support and feedback
+
+function createMentalHealthIndicator(concernLevel) {
+  const indicator = document.createElement("div");
+  const config = {
+    'crisis': { icon: '🚨', text: { en: 'Crisis Support', sn: 'Rubatsiro Rwekukurumidzira' }, color: '#dc3545' },
+    'high': { icon: '⚠️', text: { en: 'Mental Health Support', sn: 'Rubatsiro Rweutano' }, color: '#fd7e14' },
+    'moderate': { icon: '💙', text: { en: 'Wellness Resources', sn: 'Zvinhu Zvekurapwa' }, color: '#0d6efd' }
+  }[concernLevel] || { icon: '💙', text: { en: 'Support', sn: 'Rubatsiro' }, color: '#0d6efd' };
+  
+  const text = config.text[currentLanguage] || config.text['en'];
+  
+  indicator.innerHTML = `
+    <div style="display: inline-flex; align-items: center; gap: 5px; background: ${config.color}; 
+                color: white; padding: 4px 8px; border-radius: 12px; font-size: 10px; 
+                margin-top: 5px; font-weight: 500;">
+      <span>${config.icon}</span><span>${text}</span>
+    </div>`;
+  return indicator;
+}
+
+function showMentalHealthNotice(concernLevel, language) {
+  if (concernLevel === 'crisis') {
+    const messages = {
+      'en': 'If you\'re in immediate danger, please call 999 or go to your nearest emergency room.',
+      'sn': 'Kana uri munzvimbo yenjodzi, ndapota fona 999 kana uende kuchipatara.'
+    };
+    
+    const notice = document.createElement('div');
+    notice.style.cssText = `
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%); 
+      background: #dc3545; color: white; padding: 15px 20px; border-radius: 8px; 
+      z-index: 1000; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      max-width: 90%; text-align: center;
+    `;
+    notice.textContent = messages[language] || messages['en'];
+    document.body.appendChild(notice);
+    
+    setTimeout(() => notice.remove(), 10000);
+  }
+}
+
+function createFeedbackControls(conversationId, isFallback = false, isMentalHealth = false) {
+  const feedbackDiv = document.createElement("div");
+  feedbackDiv.classList.add("feedback-controls");
+  feedbackDiv.dataset.conversationId = conversationId;
+  
+  addFeedbackStyles();
+  
+  if (isMentalHealth) {
+    feedbackDiv.innerHTML = `
+      <div class="feedback-section">
+        <div class="feedback-prompt">Was this helpful for your situation?</div>
+        <div class="thumbs-feedback">
+          <button class="feedback-btn thumbs-up" onclick="submitThumbsFeedback('${conversationId}', true)">👍</button>
+          <button class="feedback-btn thumbs-down" onclick="submitThumbsFeedback('${conversationId}', false)">👎</button>
+          <span class="feedback-divider">|</span>
+          <button class="detailed-feedback-toggle" onclick="toggleDetailedFeedback('${conversationId}')">Share experience</button>
+        </div>
+        <div class="detailed-feedback" id="detailed-feedback-${conversationId}" style="display: none;">
+          <textarea placeholder="What would have been more helpful?" id="feedback-text-${conversationId}" class="feedback-textarea"></textarea>
+          <div class="feedback-actions">
+            <button onclick="cancelDetailedFeedback('${conversationId}')" class="btn-cancel">Cancel</button>
+            <button onclick="submitDetailedFeedback('${conversationId}')" class="btn-submit">Submit</button>
+          </div>
+        </div>
+        <div class="feedback-status" id="feedback-status-${conversationId}" style="display: none;"></div>
+        <div style="font-size: 10px; color: #666; margin-top: 8px; font-style: italic;">
+          💚 This chatbot provides information only. For urgent help, contact emergency services.
+        </div>
+      </div>`;
+  } else {
+    // Use your existing regular feedback HTML
+    feedbackDiv.innerHTML = `
+      <div class="feedback-section">
+        <div class="feedback-prompt">Was this response helpful?</div>
+        <div class="thumbs-feedback">
+          <button class="feedback-btn thumbs-up" onclick="submitThumbsFeedback('${conversationId}', true)">👍</button>
+          <button class="feedback-btn thumbs-down" onclick="submitThumbsFeedback('${conversationId}', false)">👎</button>
+          <span class="feedback-divider">|</span>
+          <button class="detailed-feedback-toggle" onclick="toggleDetailedFeedback('${conversationId}')">More feedback</button>
+        </div>
+        <div class="detailed-feedback" id="detailed-feedback-${conversationId}" style="display: none;">
+          <textarea placeholder="Tell us how we can improve..." id="feedback-text-${conversationId}" class="feedback-textarea"></textarea>
+          <div class="feedback-actions">
+            <button onclick="cancelDetailedFeedback('${conversationId}')" class="btn-cancel">Cancel</button>
+            <button onclick="submitDetailedFeedback('${conversationId}')" class="btn-submit">Submit</button>
+          </div>
+        </div>
+        <div class="feedback-status" id="feedback-status-${conversationId}" style="display: none;"></div>
+      </div>`;
+  }
+  
+  return feedbackDiv;
+}
+
+function addFeedbackStyles() {
+  if (document.getElementById('feedback-styles')) return;
+  
+  const style = document.createElement('style');
+  style.id = 'feedback-styles';
+  style.textContent = `
+    .feedback-controls {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+    
+    .feedback-prompt {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .thumbs-feedback {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .feedback-btn {
+      background: none;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+    
+    .feedback-btn:hover {
+      background: #f5f5f5;
+    }
+    
+    .feedback-divider {
+      color: #ddd;
+      margin: 0 5px;
+    }
+    
+    .detailed-feedback-toggle {
+      background: none;
+      border: none;
+      color: #007bff;
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: underline;
+    }
+    
+    .detailed-feedback {
+      margin-top: 10px;
+    }
+    
+    .feedback-textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+      min-height: 60px;
+      font-size: 12px;
+    }
+    
+    .feedback-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .btn-cancel, .btn-submit {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-cancel {
+      background: #f8f9fa;
+      color: #6c757d;
+    }
+    
+    .btn-submit {
+      background: #007bff;
+      color: white;
+    }
+    
+    .feedback-status {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #28a745;
+    }
+  `;
+  
+  document.head.appendChild(style);
+}
+
+function submitThumbsFeedback(conversationId, isPositive) {
+  const statusElement = document.getElementById(`feedback-status-${conversationId}`);
+  if (statusElement) {
+    statusElement.textContent = isPositive ? 'Thanks for your feedback!' : 'Thanks, we\'ll work to improve.';
+    statusElement.style.display = 'block';
+    statusElement.style.color = isPositive ? '#28a745' : '#dc3545';
+    
+    // Send feedback to server
+    fetch("/feedback/", {
+      method: "POST",
+      headers: { 
+        "X-CSRFToken": getCookie("csrftoken"), 
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({ 
+        conversation_id: conversationId,
+        feedback_type: 'thumbs',
+        is_positive: isPositive
+      })
+    }).catch(error => console.error('Error sending feedback:', error));
+  }
+}
+
+function toggleDetailedFeedback(conversationId) {
+  const feedbackElement = document.getElementById(`detailed-feedback-${conversationId}`);
+  if (feedbackElement) {
+    feedbackElement.style.display = feedbackElement.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function cancelDetailedFeedback(conversationId) {
+  const feedbackElement = document.getElementById(`detailed-feedback-${conversationId}`);
+  if (feedbackElement) {
+    feedbackElement.style.display = 'none';
+    document.getElementById(`feedback-text-${conversationId}`).value = '';
+  }
+}
+
+function submitDetailedFeedback(conversationId) {
+  const feedbackText = document.getElementById(`feedback-text-${conversationId}`).value.trim();
+  const statusElement = document.getElementById(`feedback-status-${conversationId}`);
+  
+  if (!feedbackText) return;
+  
+  if (statusElement) {
+    statusElement.textContent = 'Thank you for your detailed feedback!';
+    statusElement.style.display = 'block';
+    
+    // Send feedback to server
+    fetch("/feedback/", {
+      method: "POST",
+      headers: { 
+        "X-CSRFToken": getCookie("csrftoken"), 
+        "Content-Type": "application/json" 
+      },
+      body: JSON.stringify({ 
+        conversation_id: conversationId,
+        feedback_type: 'detailed',
+        feedback_text: feedbackText
+      })
+    }).catch(error => console.error('Error sending feedback:', error));
+    
+    // Hide the feedback form
+    document.getElementById(`detailed-feedback-${conversationId}`).style.display = 'none';
+    document.getElementById(`feedback-text-${conversationId}`).value = '';
+  }
+}
+
+// Bookmarks functionality
+
+// Toggle bookmarks panel
+function toggleBookmarksPanel() {
+  bookmarksPanel.classList.toggle('open');
+  overlay.classList.toggle('show');
+  
+  if (bookmarksPanel.classList.contains('open')) {
+    loadBookmarks();
+  }
+}
+
+// Load bookmarks into the panel
+function loadBookmarks() {
+  const searchTerm = bookmarkSearch.value.toLowerCase();
+  const category = categoryFilter.value;
+  
+  let filteredBookmarks = bookmarks.filter(bookmark => {
+    const matchesSearch = bookmark.title.toLowerCase().includes(searchTerm) || 
+                         bookmark.message.toLowerCase().includes(searchTerm) ||
+                         bookmark.response.toLowerCase().includes(searchTerm);
+    const matchesCategory = !category || bookmark.category === category;
+    return matchesSearch && matchesCategory;
+  });
+  
+  // Sort pinned bookmarks first
+  filteredBookmarks.sort((a, b) => b.pinned - a.pinned);
+  
+  if (filteredBookmarks.length === 0) {
+    bookmarksContainer.innerHTML = `
+      <div class="no-bookmarks">
+        <i class="bi bi-bookmarks" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+        <div>No bookmarks yet</div>
+        <div style="font-size: 12px; margin-top: 8px;">Bookmark important messages by clicking the bookmark button</div>
+      </div>`;
+    return;
+  }
+  
+  bookmarksContainer.innerHTML = filteredBookmarks.map(bookmark => `
+    <div class="bookmark-card ${bookmark.pinned ? 'pinned' : ''}">
+      <div class="bookmark-header">
+        <span class="bookmark-category">${bookmark.category}</span>
+        <button class="remove-btn" onclick="removeBookmark(${bookmark.id})">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+      <h4 class="bookmark-title">${bookmark.title}</h4>
+      <div class="bookmark-message"><strong>Question:</strong> ${bookmark.message}</div>
+      <div class="bookmark-response"><strong>Response:</strong> ${bookmark.response}</div>
+      ${bookmark.notes ? `<div class="bookmark-notes"><strong>Notes:</strong> ${bookmark.notes}</div>` : ''}
+      <div class="bookmark-footer">
+        <span class="bookmark-date">${bookmark.date}</span>
+        <button class="pin-btn" onclick="togglePinBookmark(${bookmark.id})">
+          ${bookmark.pinned ? '<i class="bi bi-pin-fill"></i> Pinned' : '<i class="bi bi-pin"></i> Pin'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Remove a bookmark
+function removeBookmark(id) {
+  bookmarks = bookmarks.filter(bookmark => bookmark.id !== id);
+  // Save to localStorage
+  localStorage.setItem('chatBookmarks', JSON.stringify(bookmarks));
+  loadBookmarks();
+  showNotification('Bookmark removed', 'success');
+}
+
+// Toggle pin status of a bookmark
+function togglePinBookmark(id) {
+  const bookmark = bookmarks.find(b => b.id === id);
+  if (bookmark) {
+    bookmark.pinned = !bookmark.pinned;
+    // Save to localStorage
+    localStorage.setItem('chatBookmarks', JSON.stringify(bookmarks));
+    loadBookmarks();
+    showNotification(bookmark.pinned ? 'Bookmark pinned' : 'Bookmark unpinned', 'info');
+  }
+}
+
+// Show notification
+function showNotification(message, type) {
+  notification.textContent = message;
+  notification.className = `notification ${type} show`;
+  
+  setTimeout(() => {
+    notification.classList.remove('show');
+  }, 3000);
+}
+
+// Add bookmark function (to be called from message actions)
+function addBookmark(title, message, response, category = 'general') {
+  const newBookmark = {
+    id: Date.now(),
+    title,
+    message,
+    response,
+    category,
+    date: new Date().toISOString().split('T')[0],
+    pinned: false,
+    notes: ""
+  };
+  
+  bookmarks.push(newBookmark);
+  // Save to localStorage
+  localStorage.setItem('chatBookmarks', JSON.stringify(bookmarks));
+  showNotification('Bookmark added', 'success');
+  
+  // If bookmarks panel is open, refresh it
+  if (bookmarksPanel.classList.contains('open')) {
+    loadBookmarks();
+  }
+}
+
+// Initialize bookmarks
+loadBookmarks();
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', init);
+
+// Fetch notifications from Django
+// Fetch notifications every 5 seconds
+function fetchNotifications() {
+    fetch('/notifications/')
+    .then(response => response.json())
+    .then(data => {
+        const unreadCount = data.notifications.filter(n => !n.is_read).length;
+
+        const countBadge = document.getElementById('notification-count');
+        const icon = document.getElementById('notification-icon');
+
+        if (unreadCount > 0) {
+            countBadge.style.display = 'inline';
+            countBadge.textContent = unreadCount;
+            icon.style.color = 'red';
+        } else {
+            countBadge.style.display = 'none';
+            icon.style.color = 'black';
+        }
+    })
+    .catch(err => console.error('Error fetching notifications:', err));
+}
+
+// Poll every 5 seconds
+setInterval(fetchNotifications, 5000);
+fetchNotifications();
+
+// Redirect to notifications page and mark all as read
+document.getElementById('notification-container').addEventListener('click', () => {
+    window.location.href = '/notifications/?mark_read=1';
+});
+
+
+// Gamification System
+
+// DOM Elements
+const badgesToggle = document.getElementById('badges-toggle');
+const badgesPanel = document.getElementById('badges-panel');
+const closeBadges = document.getElementById('close-badges');
+const achievementNotification = document.getElementById('achievement-notification');
+
+// Gamification state
+let userStats = {
+  level: 1,
+  xp: 0,
+  streak: 0,
+  lastActiveDate: null,
+  totalConversations: 0,
+  totalBookmarks: 0,
+  badgesEarned: [],
+  badgeProgress: {}
+};
+
+// Badge definitions
+const badges = {
+  // Conversation badges
+  firstChat: {
+    id: 'firstChat',
+    name: 'First Chat',
+    description: 'Complete your first conversation',
+    icon: '💬',
+    category: 'conversation',
+    requirement: 1,
+    xp: 50
+  },
+  chatNovice: {
+    id: 'chatNovice',
+    name: 'Chat Novice',
+    description: 'Complete 5 conversations',
+    icon: '🗣️',
+    category: 'conversation',
+    requirement: 5,
+    xp: 100
+  },
+  chatExpert: {
+    id: 'chatExpert',
+    name: 'Chat Expert',
+    description: 'Complete 25 conversations',
+    icon: '👨‍💼',
+    category: 'conversation',
+    requirement: 25,
+    xp: 250
+  },
+  
+  // Daily usage badges
+  dailyUser: {
+    id: 'dailyUser',
+    name: 'Daily User',
+    description: 'Use the chatbot for 3 consecutive days',
+    icon: '📅',
+    category: 'daily',
+    requirement: 3,
+    xp: 75
+  },
+  weeklyWarrior: {
+    id: 'weeklyWarrior',
+    name: 'Weekly Warrior',
+    description: 'Use the chatbot for 7 consecutive days',
+    icon: '🏆',
+    category: 'daily',
+    requirement: 7,
+    xp: 200
+  },
+  monthMaster: {
+    id: 'monthMaster',
+    name: 'Month Master',
+    description: 'Use the chatbot for 30 consecutive days',
+    icon: '🌟',
+    category: 'daily',
+    requirement: 30,
+    xp: 500
+  },
+  
+  // Bookmark badges
+  firstBookmark: {
+    id: 'firstBookmark',
+    name: 'First Bookmark',
+    description: 'Save your first bookmark',
+    icon: '🔖',
+    category: 'bookmark',
+    requirement: 1,
+    xp: 25
+  },
+  bookmarkCollector: {
+    id: 'bookmarkCollector',
+    name: 'Bookmark Collector',
+    description: 'Save 10 bookmarks',
+    icon: '📚',
+    category: 'bookmark',
+    requirement: 10,
+    xp: 150
+  },
+  knowledgeKeeper: {
+    id: 'knowledgeKeeper',
+    name: 'Knowledge Keeper',
+    description: 'Save 50 bookmarks',
+    icon: '📖',
+    category: 'bookmark',
+    requirement: 50,
+    xp: 300
+  },
+  
+  // Help-seeking badges
+  helpSeeker: {
+    id: 'helpSeeker',
+    name: 'Help Seeker',
+    description: 'Ask for help 5 times',
+    icon: '🙋',
+    category: 'help',
+    requirement: 5,
+    xp: 100
+  },
+  resourceExplorer: {
+    id: 'resourceExplorer',
+    name: 'Resource Explorer',
+    description: 'Use 10 different resources',
+    icon: '🔍',
+    category: 'help',
+    requirement: 10,
+    xp: 200
+  },
+  mentalHealthAdvocate: {
+    id: 'mentalHealthAdvocate',
+    name: 'Mental Health Advocate',
+    description: 'Seek mental health support 3 times',
+    icon: '💚',
+    category: 'help',
+    requirement: 3,
+    xp: 150
+  }
+};
+
+// Initialize gamification system
+function initGamification() {
+  loadUserStats();
+  updateStreak();
+  renderBadges();
+  updateProgressOverview();
+  
+  // Check for new achievements after loading
+  checkForNewAchievements();
+}
+
+// Load user stats from localStorage
+function loadUserStats() {
+  const savedStats = localStorage.getItem('chatbotUserStats');
+  if (savedStats) {
+    userStats = JSON.parse(savedStats);
+  }
+}
+
+// Save user stats to localStorage
+function saveUserStats() {
+  localStorage.setItem('chatbotUserStats', JSON.stringify(userStats));
+}
+
+// Update daily streak
+function updateStreak() {
+  const today = new Date().toDateString();
+  const lastActive = userStats.lastActiveDate ? new Date(userStats.lastActiveDate).toDateString() : null;
+  
+  if (!lastActive) {
+    // First time user
+    userStats.streak = 1;
+  } else if (lastActive === today) {
+    // Already active today, no change
+  } else {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (lastActive === yesterday.toDateString()) {
+      // Consecutive day
+      userStats.streak++;
+    } else {
+      // Broken streak
+      userStats.streak = 1;
+    }
+  }
+  
+  userStats.lastActiveDate = new Date().toISOString();
+  saveUserStats();
+}
+
+// Add XP and level up if needed
+function addXP(amount) {
+  userStats.xp += amount;
+  
+  // Check for level up
+  const xpForNextLevel = getXPForLevel(userStats.level + 1);
+  if (userStats.xp >= xpForNextLevel) {
+    userStats.level++;
+    showLevelUpNotification();
+  }
+  
+  saveUserStats();
+  updateProgressOverview();
+}
+
+// Calculate XP needed for a level
+function getXPForLevel(level) {
+  return level * 100; // Simple formula: 100 XP per level
+}
+
+// Track conversation
+function trackConversation() {
+  userStats.totalConversations++;
+  updateBadgeProgress('conversation', userStats.totalConversations);
+  saveUserStats();
+  updateProgressOverview();
+}
+
+// Track bookmark
+function trackBookmark() {
+  userStats.totalBookmarks++;
+  updateBadgeProgress('bookmark', userStats.totalBookmarks);
+  saveUserStats();
+  updateProgressOverview();
+}
+
+// Track help-seeking behavior
+function trackHelpSeeking() {
+  if (!userStats.helpSeekingCount) userStats.helpSeekingCount = 0;
+  userStats.helpSeekingCount++;
+  updateBadgeProgress('help', userStats.helpSeekingCount);
+  saveUserStats();
+}
+
+// Update badge progress
+function updateBadgeProgress(category, currentValue) {
+  // Initialize progress tracking if needed
+  if (!userStats.badgeProgress) userStats.badgeProgress = {};
+  if (!userStats.badgeProgress[category]) userStats.badgeProgress[category] = currentValue;
+  else userStats.badgeProgress[category] = Math.max(userStats.badgeProgress[category], currentValue);
+  
+  // Check for new achievements
+  checkForNewAchievements();
+}
+
+// Check for new achievements
+function checkForNewAchievements() {
+  let newAchievements = [];
+  
+  // Check each badge
+  Object.values(badges).forEach(badge => {
+    // Skip if already earned
+    if (userStats.badgesEarned.includes(badge.id)) return;
+    
+    // Check if requirement is met
+    let progress = 0;
+    if (badge.category === 'conversation') {
+      progress = userStats.totalConversations;
+    } else if (badge.category === 'bookmark') {
+      progress = userStats.totalBookmarks;
+    } else if (badge.category === 'daily') {
+      progress = userStats.streak;
+    } else if (badge.category === 'help') {
+      progress = userStats.helpSeekingCount || 0;
+    }
+    
+    if (progress >= badge.requirement) {
+      // Earned the badge!
+      userStats.badgesEarned.push(badge.id);
+      newAchievements.push(badge);
+      addXP(badge.xp);
+    }
+  });
+  
+  // Show notifications for new achievements
+  newAchievements.forEach((badge, index) => {
+    setTimeout(() => {
+      showAchievementNotification(badge);
+    }, index * 1500); // Stagger notifications
+  });
+  
+  if (newAchievements.length > 0) {
+    saveUserStats();
+    renderBadges();
+    updateProgressOverview();
+  }
+}
+
+// Show achievement notification
+function showAchievementNotification(badge) {
+  const icon = document.getElementById('achievement-icon');
+  const title = document.getElementById('achievement-title');
+  const description = document.getElementById('achievement-description');
+  
+  icon.textContent = badge.icon;
+  title.textContent = badge.name;
+  description.textContent = badge.description;
+  
+  achievementNotification.classList.add('show');
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    achievementNotification.classList.remove('show');
+  }, 5000);
+}
+
+// Show level up notification
+function showLevelUpNotification() {
+  const icon = document.getElementById('achievement-icon');
+  const title = document.getElementById('achievement-title');
+  const description = document.getElementById('achievement-description');
+  
+  icon.textContent = '🎉';
+  title.textContent = `Level ${userStats.level}!`;
+  description.textContent = `You've reached level ${userStats.level}`;
+  
+  achievementNotification.classList.add('show');
+  
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    achievementNotification.classList.remove('show');
+  }, 5000);
+}
+
+// Render badges in the panel
+function renderBadges() {
+  // Group badges by category
+  const badgesByCategory = {
+    conversation: [],
+    daily: [],
+    bookmark: [],
+    help: []
+  };
+  
+  Object.values(badges).forEach(badge => {
+    badgesByCategory[badge.category].push(badge);
+  });
+  
+  // Render each category
+  Object.keys(badgesByCategory).forEach(category => {
+    const container = document.getElementById(`${category}-badges`);
+    if (!container) return;
+    
+    container.innerHTML = badgesByCategory[category].map(badge => {
+      const isUnlocked = userStats.badgesEarned.includes(badge.id);
+      let progress = 0;
+      
+      // Calculate progress
+      if (badge.category === 'conversation') {
+        progress = Math.min(userStats.totalConversations / badge.requirement, 1) * 100;
+      } else if (badge.category === 'bookmark') {
+        progress = Math.min(userStats.totalBookmarks / badge.requirement, 1) * 100;
+      } else if (badge.category === 'daily') {
+        progress = Math.min(userStats.streak / badge.requirement, 1) * 100;
+      } else if (badge.category === 'help') {
+        progress = Math.min((userStats.helpSeekingCount || 0) / badge.requirement, 1) * 100;
+      }
+      
+      return `
+        <div class="badge ${isUnlocked ? 'unlocked' : 'locked'}" title="${badge.description}">
+          <span class="badge-icon">${badge.icon}</span>
+          <div class="badge-name">${badge.name}</div>
+          <div class="badge-description">${isUnlocked ? 'Unlocked!' : `${Math.round(progress)}%`}</div>
+          <div class="badge-progress">
+            <div class="badge-progress-fill" style="width: ${progress}%"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  });
+}
+
+// Update progress overview
+function updateProgressOverview() {
+  // Update stats
+  document.getElementById('current-streak').textContent = `${userStats.streak} days`;
+  document.getElementById('current-level').textContent = userStats.level;
+  document.getElementById('current-xp').textContent = userStats.xp;
+  document.getElementById('next-level-xp').textContent = getXPForLevel(userStats.level + 1);
+  document.getElementById('total-badges').textContent = userStats.badgesEarned.length;
+  document.getElementById('total-conversations').textContent = userStats.totalConversations;
+  document.getElementById('total-bookmarks').textContent = userStats.totalBookmarks;
+  
+  // Update level progress
+  const xpForCurrentLevel = getXPForLevel(userStats.level);
+  const xpForNextLevel = getXPForLevel(userStats.level + 1);
+  const xpInLevel = userStats.xp - xpForCurrentLevel;
+  const xpNeeded = xpForNextLevel - xpForCurrentLevel;
+  const progressPercent = (xpInLevel / xpNeeded) * 100;
+  
+  document.getElementById('level-progress').style.width = `${progressPercent}%`;
+  
+  // Update badge indicator
+  const badgesBtn = document.getElementById('badges-toggle');
+  if (userStats.badgesEarned.length > 0) {
+    badgesBtn.classList.add('has-badge');
+  } else {
+    badgesBtn.classList.remove('has-badge');
+  }
+}
+
+// Toggle badges panel
+function toggleBadgesPanel() {
+  badgesPanel.classList.toggle('open');
+  overlay.classList.toggle('show');
+  
+  if (badgesPanel.classList.contains('open')) {
+    renderBadges();
+    updateProgressOverview();
+  }
+}
+
+// Add event listeners for gamification
+function setupGamificationEventListeners() {
+  badgesToggle.addEventListener('click', toggleBadgesPanel);
+  closeBadges.addEventListener('click', toggleBadgesPanel);
+  
+  // Overlay click should close badges panel too
+  overlay.addEventListener('click', () => {
+    if (badgesPanel.classList.contains('open')) {
+      toggleBadgesPanel();
+    }
+  });
+}
+
+// Initialize gamification when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  initGamification();
+  setupGamificationEventListeners();
+});
+
+// Integrate with existing functionality
+
+// Modify your existing sendMessage function to track conversations
+const originalSendMessage = sendMessage;
+sendMessage = function() {
+  const text = messageInput.value.trim();
+  if (!text) return;
+  
+  // Track conversation
+  trackConversation();
+  
+  // Call original function
+  originalSendMessage();
+};
+
+// Modify your existing addBookmark function to track bookmarks
+const originalAddBookmark = addBookmark;
+addBookmark = function(title, message, response, category = 'general') {
+  // Track bookmark
+  trackBookmark();
+  
+  // Call original function
+  originalAddBookmark(title, message, response, category);
+};
+
+// Add mental health tracking
+function trackMentalHealthInteraction() {
+  trackHelpSeeking();
+}
+</script>
+</body>
+</html>
